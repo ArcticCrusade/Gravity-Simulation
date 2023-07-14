@@ -7,11 +7,15 @@ G = 4
 class Planet:
     x_accel = 0
     y_accel = 0
+    x_velocity = 0
+    y_velocity = 0
     
-    def __init__(self, start_pos, mass):
-        self.x_velocity = random.randint(-150, 150)
-        self.y_velocity = random.randint(-150, 150)
+    def __init__(self, start_pos, mass, static):
+        if not static:
+            self.x_velocity = random.randint(-100, 100)
+            self.y_velocity = random.randint(-100, 100)
         self.x_pos = start_pos[0]
+        self.static = static
         self.y_pos = start_pos[1]
         self.color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.mass = mass
@@ -21,14 +25,15 @@ class Planet:
         return [self.x_pos, self.y_pos]
 
 def calculate_accel(planet1, planet2):
-    if id(planet1) == id(planet2):
+    if id(planet1) == id(planet2) or planet1.static:
         return [0, 0]
     mass = planet2.mass
     x_dist = planet1.x_pos - planet2.x_pos
     y_dist = planet1.y_pos - planet2.y_pos
 
-    distance = max((x_dist ** 2 + y_dist ** 2) ** .5, planet1.radius ** 2)
+    distance = max(((x_dist ** 2 + y_dist ** 2) ** .5) - planet1.radius - planet2.radius, planet1.radius ** 2)
     x_force = G * mass * x_dist / (distance ** 3)
     y_force = G * mass * y_dist / (distance ** 3)
     return [-x_force, -y_force]
+    
     
