@@ -12,10 +12,11 @@ mass = 1000000
 font = pygame.font.Font('freesansbold.ttf', 28)
 center = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 planets = []
-
+s_pressed = False
 mouse_down = False
 
 while running:
+    keys = pygame.key.get_pressed()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -23,20 +24,28 @@ while running:
     left, middle, right = pygame.mouse.get_pressed()
 
     if left and not mouse_down:
-        planets.append(Planet(pygame.Vector2(pygame.mouse.get_pos()), mass))
+        planets.append(Planet(pygame.Vector2(pygame.mouse.get_pos()), mass, keys[pygame.K_s]))
         mouse_down = True
     elif not left:
         mouse_down = False
 
-    keys = pygame.key.get_pressed()
+    
 
     if keys[pygame.K_PLUS] or keys[pygame.K_EQUALS]:
         mass += 100000
-    
-    if (keys[pygame.K_MINUS] or keys[pygame.K_UNDERSCORE]) and mass > 1:
+    if keys[pygame.K_p]:
+        mass += 1000000
+    if keys[pygame.K_r]:
+        planets = []
+    if keys[pygame.K_1]:
+        mass = 100000
+    elif keys[pygame.K_9]:
+        mass = 100000000
+    if (keys[pygame.K_MINUS] or keys[pygame.K_UNDERSCORE]) and mass > 200000:
         mass -= 100000
-
-
+    if keys[pygame.K_m] and mass > 1000000:
+        mass -= 1000000
+    
 
     screen.fill("black")
     text = font.render("Mass: " + str(mass / 1000000) + " Million", True, (255, 255, 255), (0, 0, 0))
@@ -48,8 +57,9 @@ while running:
         planet1.x_accel = 0
         planet1.y_accel = 0
         for planet2 in planets:
-            planet1.x_accel += calculate_accel(planet1, planet2)[0]
-            planet1.y_accel += calculate_accel(planet1, planet2)[1]
+            accel = calculate_accel(planet1, planet2)
+            planet1.x_accel += accel[0]
+            planet1.y_accel += accel[1]
         planet1.x_velocity += planet1.x_accel * dt
         planet1.y_velocity += planet1.y_accel * dt
         planet1.x_pos += planet1.x_velocity * dt
